@@ -104,4 +104,54 @@ def minimax(board):
     """
     Returns the optimal action for the current player on the board.
     """
+    bestMove = (0, 0)
+    copyState = deepcopy(board)                         # 1. Copy the board into a temporary state 
+    currPlayer = player(board)                          # 2. Determine the current player
     
+    if currPlayer is X:                                 # 3. If the current player is 'X'
+        score = -math.inf                                   # i) Set the score to -infinity
+        possibleMoves = actions(copyState)                  # ii) Find all possible moves
+        for move in possibleMoves:                          # iii) Iterate over all possible moves    
+            resultantState = result(copyState, move)        # iv) Find the resultant state after applying the current move     
+            bestScore = minimize(resultantState)            # v) Score will be the maximum of all the 
+                                                                # scores returned from 'Os' optimal move
+            if bestScore > score:                           # vi) If the best score is greater than currentScore
+                score = bestScore                               # Store new values for score and bestmove
+                bestMove = move
+        
+    else:                                               # 4. If the current player is 'O'
+        score = math.inf                                    # i) Set the score to infinity
+        possibleMoves = actions(copyState)                  # ii) Find all possible moves
+        for move in possibleMoves:                          # iii) Iterate over all possible moves    
+            resultantState = result(copyState, move)        # iv) Find the resultant state after applying the current move     
+            bestScore = maximize(resultantState)            # v) Score will be the minimum of all the 
+                                                                # scores returned from 'Xs' optimal move
+            if bestScore < score:                           # vi) If the best score is greater than currentScore
+                score = bestScore                               # Store new values for score and bestmove
+                bestMove = move
+    
+    return bestMove                                     # Return the best move
+
+
+def minimize(board):                                     
+    if terminal(board):                                 # If the terminal state is reached, return the score of the board
+        return utility(board)
+    
+    score = math.inf                                    # Pick a number that is greater than any other number 
+    possibleMoves = actions(board)                      # Find a set of possible moves for the board
+    for move in possibleMoves:                          # Iterate over the list
+        resultant = result(board, move)                 # Find the resultant from the current move
+        score = min(score, maximize(resultant))         # Minimize the score obtained from X's optimal move
+    return score
+
+    
+def maximize(board): 
+    if terminal(board):                                 # If the terminal state is reached, return the utility score of the board
+        return utility(board)
+    
+    score = -math.inf                                   # Set score to the smallest possible number
+    possibleMoves = actions(board)                      # Find all possible moves for the current state
+    for move in possibleMoves:                          # Iterate over all possible moves
+        resultant = result(board, move)                 # Find the resultant from the current move
+        score = max(score, minimize(resultant))         # Maximize the score obtained from O's optimal moves
+    return score
